@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Temperamento</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .question { margin-bottom: 10px; }
+        #result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>Teste de Temperamento</h2>
+    <form id="temperamentForm">
+        <div id="questions"></div>
+        <button type="button" onclick="calculateTemperament()">Calcular Temperamento</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        const questions = [
+			"01. Você reage prontamente a ofensas e tende a rebater um insulto no mesmo instante?",
+			"02. Você costuma ver sempre o lado mais sério das coisas?",
+			"03. Você perde facilmente a confiança nos outros?",
+			"04. Você costuma elogiar bastante àqueles a quem ama?",
+			"05. Você sucumbe diante de explicações lógicas, mas resiste firmemente a qualquer tentativa de convencê-lo pela força?",
+			"06. Você adora a companhia e diversão em geral?",
+			"07. Seus pensamentos, de maneira geral, transformam-se em reflexão, o que pode mexer com seus sentimentos mais profundos, embora não deixa isso transparecer em seu semblante?",
+			"08. Você costuma se sentir muito irritado diante de injustiças e desordem?",
+			"09. Você tem, e/ou demonstra, pouco interesse no que dizem a seu respeito?",
+			"10. Acha difícil confiar nos outros e tem medo que alguém possa ter algo contra você?",
+			"11. Não costuma refletir durante muito tempo, pois perde o foco e distrai-se com facilidade?",
+			"12. Não reage a uma ofensa de imediato, mas costuma senti-la mais intensamente algumas horas ou dias depois?",
+			"13. Tem dificuldade para se decidir, mesmo quando o assunto é importante?",
+			"14. Zanga-se rapidamente, mas esquece com a mesma rapidez e não guarda rancores?",
+			"15. Você é um entusiasta que busca sempre realizar grandes feitos?",
+			"16. Costuma ser líder em todos os locais e atividades em que toma parte?",
+			"17. Você adora o silêncio e a solidão?",
+			"18. Fica enciumado com frequência?",
+			"19. Gosta de estar sempre no comando?",
+			"20. Passa muito tempo deliberando e tem dificuldade para tomar decisões?",
+			"21. Adora ser elogiado e acha isso muito importante num relacionamento?",
+			"22. Tem facilidade para se comunicar?",
+			"23. Evita discussões e qualquer coisa que exija que tome partido?",
+			"24. Sente-se desencorajado diante da primeira dificuldade que encontra?",
+			"25. Tem dificuldade de fazer novos amigos, não gosta de falar com estranhos ou de manifestar suas opiniões em público?",
+			"26. Costuma dar muita importância a sua aparência e à dos outros?",
+			"27. Persevera sempre, mesmo diante das maiores dificuldades?",
+			"28. Fica reticente ou desconfiado diante de um comentário mais rude ou inamistoso?",
+			"29. Não consegue conter-se, tem dificuldade para ficar em silêncio?",
+			"30. Uma de suas maiores virtudes é a coragem para desbravar novos caminhos?",
+			"31. Permite que os outros tomem sua frente em muitos momentos, mas, ao mesmo tempo, sente-se irritado por ter sido ignorado?",
+			"32. Não gosta, ou até mesmo odeia, demonstrações excessivas de sentimentalismo?",
+			"33. Pode ser cruel e grosseiro quando não consegue atingir seus objetivos?",
+			"34. Você prefere atividades mentais a esforço físico?",
+			"35. Prefere não opinar sobre um assunto se isso significar que terá de se envolver em polêmica?",
+			"36. Tem uma forte tendência a bancar o indiferente mesmo quando interiormente esteja muito abalado?",
+			"37. Considera-se flexível quando precisa negociar algo com alguém, seja esta pessoa chefe, funcionário, filho ou cônjuge?",
+			"38. Mantêm a compostura mesmo em face de sofrimento ou de ofensa deliberada?",
+			"39. Gosta de trabalhos e atividades que não exijam contato com o público?",
+			"40. Considera-se alguém especial, que está sempre certo e que não precisa que ninguém lhe diga o que fazer?",
+            // Adicione as demais perguntas aqui...
+        ];
+
+        const scores = [
+			["colerico"],
+			["melancolico"],
+			["melancolico"],
+			["sanguineo"],
+			["colerico", "melancolico"],
+			["sanguineo"],
+			["melancolico"],
+			["colerico"],
+			["fleumatico"],
+			["melancolico"],
+			["sanguineo"],
+			["melancolico"],
+			["sanguineo", "melancolico"],
+			["sanguineo"],
+			["colerico"],
+			["colerico"],
+			["melancolico"],
+			["melancolico"],
+			["colerico"],
+			["sanguineo", "melancolico", "fleumatico"],
+			["sanguineo"],
+			["sanguineo"],
+			["fleumatico"],
+			["sanguineo"],
+			["fleumatico"],
+			["sanguineo"],
+			["colerico"],
+			["fleumatico"],
+			["sanguineo"],
+			["colerico"],
+			["fleumatico"],
+			["colerico"],
+			["colerico"],
+			["fleumatico"],
+			["fleumatico"],
+			["fleumatico"],
+			["fleumatico"],
+			["fleumatico"],
+			["melancolico"],
+			["colerico"], // Agora cada questão pode ter múltiplos temperamentos
+        ];
+
+        const temperamentMap = {
+            colerico: "Colérico",
+            sanguineo: "Sanguíneo",
+            melancolico: "Melancólico",
+            fleumatico: "Fleumático"
+        };
+
+        function loadQuestions() {
+            const container = document.getElementById("questions");
+            questions.forEach((question, index) => {
+                const div = document.createElement("div");
+                div.classList.add("question");
+                div.innerHTML = `<input type='checkbox' name='q${index}' value='${scores[index].join(",")}' onchange='updateSelection(this, ${index})'> ${question}`;
+                container.appendChild(div);
+            });
+        }
+
+        function updateSelection(checkbox, index) {
+            const values = scores[index];
+            checkbox.setAttribute("data-values", values.join(","));
+        }
+
+        function calculateTemperament() {
+            const checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
+            const result = { colerico: 0, sanguineo: 0, melancolico: 0, fleumatico: 0 };
+            
+            checkboxes.forEach(checkbox => {
+                const values = checkbox.getAttribute("data-values").split(",");
+                values.forEach(value => result[value]++);
+            });
+            
+            const maxTemperament = Object.keys(result).reduce((a, b) => result[a] > result[b] ? a : b);
+            document.getElementById("result").innerText = `Seu temperamento predominante é: ${temperamentMap[maxTemperament]}`;
+        }
+
+        loadQuestions();
+    </script>
+</body>
+</html>
