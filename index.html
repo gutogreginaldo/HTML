@@ -8,13 +8,36 @@
         body { font-family: Arial, sans-serif; padding: 20px; }
         .question { margin-bottom: 10px; }
         #result { margin-top: 20px; font-weight: bold; }
+        #calculateButton {
+            font-size: 20px;
+            padding: 15px 30px;
+            margin-top: 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #calculateButton:hover {
+            background-color: #0056b3;
+        }
+        .info-box {
+            border: 2px solid #007BFF;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f0f8ff;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <h2>Teste de Temperamento</h2>
+    <div class="info-box">
+        <p>Este questionário o ajudará a descobrir qual pode ser seu temperamento dominante. Seja honesto ao responder as questões abaixo, pois elas se referem muito mais às suas inclinações e tendências naturais do que às suas atitudes tomadas após exercitar o autocontrole. Assinale as perguntas para as quais sua resposta for afirmativa, depois confira com o resultado apresentado no fim.</p>
+    </div>
     <form id="temperamentForm">
         <div id="questions"></div>
-        <button type="button" onclick="calculateTemperament()">Calcular Temperamento</button>
+        <button type="button" id="calculateButton" onclick="calculateTemperament()">Calcular Temperamento</button>
     </form>
     <div id="result"></div>
 
@@ -60,7 +83,6 @@
 			"38. Mantêm a compostura mesmo em face de sofrimento ou de ofensa deliberada?",
 			"39. Gosta de trabalhos e atividades que não exijam contato com o público?",
 			"40. Considera-se alguém especial, que está sempre certo e que não precisa que ninguém lhe diga o que fazer?",
-            // Adicione as demais perguntas aqui...
         ];
 
         const scores = [
@@ -103,7 +125,7 @@
 			["fleumatico"],
 			["fleumatico"],
 			["melancolico"],
-			["colerico"], // Agora cada questão pode ter múltiplos temperamentos
+			["colerico"],
         ];
 
         const temperamentMap = {
@@ -130,6 +152,11 @@
 
         function calculateTemperament() {
             const checkboxes = document.querySelectorAll("input[type='checkbox']:checked");
+            if (checkboxes.length === 0) {
+                document.getElementById("result").innerText = "Selecione pelo menos uma pergunta.";
+                return;
+            }
+            
             const result = { colerico: 0, sanguineo: 0, melancolico: 0, fleumatico: 0 };
             
             checkboxes.forEach(checkbox => {
